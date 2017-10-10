@@ -1,6 +1,8 @@
 import React, { Component } from 'react'
-import { Link, Route, Switch } from 'react-router-dom'
+import { Link, Route, Switch, Redirect } from 'react-router-dom'
 import Category from './Category'
+import Products from './Products'
+import Login, { fakeAuth } from './Login'
 
 /* Home component */
 const Home = () => {
@@ -11,12 +13,15 @@ const Home = () => {
   )
 }
 
-/* Product component */
-const Products = () => {
+const PrivateRoute = ({ component: Component, authed, ...rest }) => {
   return (
-    <div>
-      <h2>Products</h2>
-    </div>
+    <Route
+      {...rest}
+      render={props =>
+        (authed === true
+          ? <Component {...props} />
+          : <Redirect to={{ pathname: '/login', state: { from: props.location } }} />)}
+    />
   )
 }
 
@@ -42,7 +47,8 @@ class App extends Component {
         <Switch>
           <Route exact path='/' component={Home} />
           <Route path='/category' component={Category} />
-          <Route path='/products' component={Products} />
+          <Route path='/login' component={Login} />
+          <PrivateRoute authed={fakeAuth.isAuthenticated} path='/products' component={Products} />
         </Switch>
       </div>
     )
